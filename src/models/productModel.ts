@@ -86,8 +86,21 @@ const productSchema: Schema = new Schema(
   {
     timestamps: true,
     versionKey: false,
+    toJSON: {
+      virtuals: true,
+      transform: (_, ret) => {
+        ret.id = ret._id;
+        delete ret._id;
+        delete ret.__v;
+        return ret;
+      },
+    },
   }
 );
+
+productSchema.virtual("id").get(function (this: IProduct) {
+  return this._id.toHexString();
+});
 
 const Product = mongoose.model<IProduct>("Product", productSchema);
 

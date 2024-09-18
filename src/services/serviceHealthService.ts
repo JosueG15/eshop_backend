@@ -1,8 +1,9 @@
-import mongoose, { mongo } from "mongoose";
+import mongoose from "mongoose";
 import { ServiceHealthResponse } from "../models/serviceHealthModel";
 import { PackageModel } from "../models/packageModel";
 import fs from "fs";
 import path from "path";
+import redisClient from "../config/redisClient"; // Import existing Redis client
 
 export class ServiceHealthService {
   private package: PackageModel;
@@ -28,6 +29,7 @@ export class ServiceHealthService {
   public async getConnectedServices(): Promise<ServiceHealthResponse[]> {
     const services: ServiceHealthResponse[] = [];
 
+    // MongoDB Health Check
     const mongoHealth: ServiceHealthResponse = {
       serviceName: "MongoDB",
       checkDate: new Date().toISOString(),
@@ -38,8 +40,32 @@ export class ServiceHealthService {
           : "Service is not working",
       serviceVersion: mongoose.version,
     };
-
     services.push(mongoHealth);
+
+    // Redis Health Check
+    try {
+      const redisPing = await redisClient.ping();
+      const redisHealth: ServiceHealthResponse = {
+        serviceName: "Redis",
+        checkDate: new Date().toISOString(),
+        isUp: redisPing === "PONG",
+        statusMessage:
+          redisPing === "PONG"
+            ? "Service is working"
+            : "Service is not working",
+        serviceVersion: "N/A",
+      };
+      services.push(redisHealth);
+    } catch (error) {
+      const redisHealth: ServiceHealthResponse = {
+        serviceName: "Redis",
+        checkDate: new Date().toISOString(),
+        isUp: false,
+        statusMessage: "Redis is not working",
+        serviceVersion: "N/A",
+      };
+      services.push(redisHealth);
+    }
 
     return services;
   }

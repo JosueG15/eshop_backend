@@ -5,10 +5,50 @@ const router = Router();
 
 /**
  * @swagger
+ * components:
+ *   schemas:
+ *     ServiceHealth:
+ *       type: object
+ *       properties:
+ *         serviceName:
+ *           type: string
+ *           description: Name of the service
+ *         checkDate:
+ *           type: string
+ *           format: date-time
+ *           description: Date and time the service health was checked
+ *         isUp:
+ *           type: boolean
+ *           description: Whether the service is up or down
+ *         serviceVersion:
+ *           type: string
+ *           description: Current version of the service
+ *         statusMessage:
+ *           type: string
+ *           description: Message describing the current status of the service
+ *         connectedServices:
+ *           type: array
+ *           description: Health statuses of connected services like MongoDB
+ *           items:
+ *             type: object
+ *             properties:
+ *               serviceName:
+ *                 type: string
+ *               isUp:
+ *                 type: boolean
+ *               statusMessage:
+ *                 type: string
+ *               checkDate:
+ *                 type: string
+ *                 format: date-time
+ */
+
+/**
+ * @swagger
  * /service-health:
  *   get:
  *     summary: Get service health status
- *     description: Retrieves the health status of the service, including connected services like MongoDB if deep parameter is passed.
+ *     description: Retrieves the health status of the service, including connected services like MongoDB if the `deep` parameter is passed.
  *     tags: [Service Health]
  *     parameters:
  *       - in: query
@@ -22,40 +62,7 @@ const router = Router();
  *         content:
  *           application/json:
  *             schema:
- *               type: object
- *               properties:
- *                 serviceName:
- *                   type: string
- *                   example: my-service
- *                 checkDate:
- *                   type: string
- *                   example: 2024-09-17T12:34:56.789Z
- *                 isUp:
- *                   type: boolean
- *                   example: true
- *                 serviceVersion:
- *                   type: string
- *                   example: 1.0.0
- *                 statusMessage:
- *                   type: string
- *                   example: The service is working
- *                 connectedServices:
- *                   type: array
- *                   items:
- *                     type: object
- *                     properties:
- *                       serviceName:
- *                         type: string
- *                         example: MongoDB
- *                       isUp:
- *                         type: boolean
- *                         example: true
- *                       statusMessage:
- *                         type: string
- *                         example: MongoDB is working
- *                       checkDate:
- *                         type: string
- *                         example: 2024-09-17T12:34:56.789Z
+ *               $ref: '#/components/schemas/ServiceHealth'
  *       500:
  *         description: Internal server error
  *         content:

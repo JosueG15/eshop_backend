@@ -11,6 +11,13 @@ const swaggerOptions = {
       description: "A dynamic API documentation for the E-commerce platform",
     },
     components: {
+      securitySchemes: {
+        bearerAuth: {
+          type: "http",
+          scheme: "bearer",
+          bearerFormat: "JWT",
+        },
+      },
       schemas: {
         Error: {
           type: "object",
@@ -41,9 +48,21 @@ const swaggerOptions = {
         },
       },
     },
+    security: [
+      {
+        bearerAuth: [],
+      },
+    ],
     servers: [
       {
-        url: `http://localhost:${process.env.API_PORT || 3000}`,
+        url: `http://localhost:${process.env.API_PORT || 3000}${
+          process.env.API_V1_URL || "/api"
+        }`,
+      },
+      {
+        url: `http://localhost:${process.env.API_PORT || 3000}${
+          process.env.API_BASE_URL || "/api/v1"
+        }`,
       },
     ],
   },
