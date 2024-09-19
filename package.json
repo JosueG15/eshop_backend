@@ -5,7 +5,8 @@
   "main": "app.ts",
   "scripts": {
     "dev": "nodemon --exec ts-node src/app.ts",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "tsc",
+    "start": "node dist/app.js"
   },
   "author": "Josue Garcia",
   "license": "ISC",
