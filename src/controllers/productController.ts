@@ -8,8 +8,10 @@ import {
 import { buildGlobalFilters, handleGlobalError } from "../helpers/globalHelper";
 import { validatePaginationParams } from "../helpers/paginationHelper";
 import { checkCategoryExists } from "../helpers/productHelper";
+import { ImageUploadService } from "../services/imageUploadService";
 
 const productService = new ProductService();
+const imageUploadService = new ImageUploadService();
 
 export const getProducts = async (req: Request, res: Response) => {
   try {
@@ -56,6 +58,7 @@ export const getProduct = async (req: Request, res: Response) => {
 export const createProduct = async (req: Request, res: Response) => {
   try {
     const { name, description, price, category, countInStock } = req.body;
+    const files = req.files as Express.Multer.File[];
 
     if (!name || !description || !price || !category || !countInStock) {
       const badRequestResponse = getBadRequestError(
@@ -69,7 +72,14 @@ export const createProduct = async (req: Request, res: Response) => {
 
     await checkCategoryExists(category);
 
-    const newProduct = await productService.createProduct(req.body);
+    const imageUrls = await imageUploadService.uploadImagesToS3(files);
+
+    const newProduct = await productService.createProduct({
+      ...req.body,
+      image: imageUrls[0],
+      images: imageUrls,
+    });
+
     res.status(201).json({ success: true, data: newProduct });
   } catch (error) {
     return handleGlobalError(res, "Failed to create new product", error);
@@ -79,15 +89,27 @@ export const createProduct = async (req: Request, res: Response) => {
 export const updateProduct = async (req: Request, res: Response) => {
   try {
     const { category } = req.body;
+    const files = req.files as Express.Multer.File[];
 
     if (category) {
-      await checkCategoryExists(category); // Category existence check
+      await checkCategoryExists(category);
+    }
+
+    let updatedProductData = req.body;
+    if (files && files.length > 0) {
+      const imageUrls = await imageUploadService.uploadImagesToS3(files);
+      updatedProductData = {
+        ...req.body,
+        image: imageUrls[0],
+        images: imageUrls,
+      };
     }
 
     const updatedProduct = await productService.updateProduct(
       req.params.id,
-      req.body
+      updatedProductData
     );
+
     if (!updatedProduct) {
       const notFoundResponse = getNotFoundError(
         `Product with id: ${req.params.id} was not found`
@@ -96,6 +118,7 @@ export const updateProduct = async (req: Request, res: Response) => {
         .status(notFoundResponse.statusCode)
         .json({ success: false, error: notFoundResponse });
     }
+
     res.json({ success: true, data: updatedProduct });
   } catch (error) {
     return handleGlobalError(
@@ -108,7 +131,26 @@ export const updateProduct = async (req: Request, res: Response) => {
 
 export const deleteProduct = async (req: Request, res: Response) => {
   try {
+    const product = await productService.getProductById(req.params.id);
+
+    if (!product) {
+      const notFoundResponse = getNotFoundError(
+        `Product with id: ${req.params.id} was not found`
+      );
+      return res
+        .status(notFoundResponse.statusCode)
+        .json({ success: false, error: notFoundResponse });
+    }
+
+    const imageKeysToDelete: string[] = [];
+    if (product.images && product.images.length > 0) {
+      imageKeysToDelete.push(...product.images);
+    }
+
+    await imageUploadService.deleteImagesFromS3(imageKeysToDelete);
+
     const deletedProduct = await productService.deleteProduct(req.params.id);
+
     if (!deletedProduct) {
       const notFoundResponse = getNotFoundError(
         `Product with id: ${req.params.id} was not found`
@@ -117,13 +159,16 @@ export const deleteProduct = async (req: Request, res: Response) => {
         .status(notFoundResponse.statusCode)
         .json({ success: false, error: notFoundResponse });
     }
+
     res.json({ success: true, data: "Product deleted successfully" });
   } catch (error) {
-    return handleGlobalError(
-      res,
+    const errorResponse = getInternalServerError(
       `Failed to delete product with id: ${req.params.id}`,
       error
     );
+    return res
+      .status(errorResponse.statusCode)
+      .json({ success: false, error: errorResponse });
   }
 };
 

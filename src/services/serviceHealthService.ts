@@ -4,6 +4,8 @@ import { PackageModel } from "../models/packageModel";
 import fs from "fs";
 import path from "path";
 import redisClient from "../config/redisClient"; // Import existing Redis client
+import { ListBucketsCommand } from "@aws-sdk/client-s3";
+import s3 from "../config/s3Client";
 
 export class ServiceHealthService {
   private package: PackageModel;
@@ -65,6 +67,28 @@ export class ServiceHealthService {
         serviceVersion: "N/A",
       };
       services.push(redisHealth);
+    }
+
+    try {
+      const command = new ListBucketsCommand({});
+      await s3.send(command);
+      const s3Health: ServiceHealthResponse = {
+        serviceName: "S3",
+        checkDate: new Date().toISOString(),
+        isUp: true,
+        statusMessage: "S3 is working",
+        serviceVersion: "N/A",
+      };
+      services.push(s3Health);
+    } catch (error) {
+      const s3Health: ServiceHealthResponse = {
+        serviceName: "S3",
+        checkDate: new Date().toISOString(),
+        isUp: false,
+        statusMessage: "S3 is not working",
+        serviceVersion: "N/A",
+      };
+      services.push(s3Health);
     }
 
     return services;

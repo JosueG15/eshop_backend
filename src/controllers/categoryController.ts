@@ -5,8 +5,10 @@ import {
   getNotFoundError,
   getBadRequestError,
 } from "../helpers/errorHelper";
+import { ImageUploadService } from "../services/imageUploadService";
 
 const categoryService = new CategoryService();
+const imageUploadService = new ImageUploadService();
 
 export const getCategories = async (req: Request, res: Response) => {
   try {
@@ -48,7 +50,9 @@ export const getCategory = async (req: Request, res: Response) => {
 };
 
 export const createCategory = async (req: Request, res: Response) => {
-  const { name, color, icon, image } = req.body;
+  const { name, color, icon } = req.body;
+  let image = "";
+
   try {
     if (!name) {
       const badRequestError = getBadRequestError(
@@ -59,20 +63,23 @@ export const createCategory = async (req: Request, res: Response) => {
         .json({ success: false, error: badRequestError });
     }
 
+    if (req.file) {
+      const uploadedImage = await imageUploadService.uploadImageToS3(req.file);
+      image = uploadedImage.Location;
+    }
+
     const newCategory = await categoryService.createCategory({
       name,
       color,
       icon,
       image,
     });
+
     res.status(201).json({ success: true, data: newCategory });
   } catch (error) {
     const errorResponse = getInternalServerError(
-      `Failed to create a new category`,
-      {
-        error,
-        body: { name, color, icon, image },
-      }
+      "Failed to create a new category",
+      error
     );
     res
       .status(errorResponse.statusCode)
@@ -82,28 +89,39 @@ export const createCategory = async (req: Request, res: Response) => {
 
 export const updateCategory = async (req: Request, res: Response) => {
   try {
-    const updatedCategory = await categoryService.updateCategory(
-      req.params.id,
-      req.body
-    );
+    const { name, color, icon } = req.body;
+    let image = req.body.image;
 
-    if (!updatedCategory) {
+    const category = await categoryService.getCategoryById(req.params.id);
+    if (!category) {
       const notFoundResponse = getNotFoundError(
-        `No category was found with id: ${req.params.id}`
+        `No category found with id: ${req.params.id}`
       );
       return res
         .status(notFoundResponse.statusCode)
         .json({ success: false, error: notFoundResponse });
     }
 
+    if (req.file) {
+      const uploadedImage = await imageUploadService.uploadImageToS3(req.file);
+      image = uploadedImage.Location;
+    }
+
+    const updatedCategory = await categoryService.updateCategory(
+      req.params.id,
+      {
+        name,
+        color,
+        icon,
+        image,
+      }
+    );
+
     res.json({ success: true, data: updatedCategory });
   } catch (error) {
     const errorResponse = getInternalServerError(
       `Failed to update category with id: ${req.params.id}`,
-      {
-        error,
-        body: req.body,
-      }
+      error
     );
     res
       .status(errorResponse.statusCode)
@@ -113,24 +131,39 @@ export const updateCategory = async (req: Request, res: Response) => {
 
 export const deleteCategory = async (req: Request, res: Response) => {
   try {
-    const deleteCategory = await categoryService.deleteCategory(req.params.id);
+    const category = await categoryService.getCategoryById(req.params.id);
 
-    if (!deleteCategory) {
+    if (!category) {
       const notFoundResponse = getNotFoundError(
-        `No category was found with id: ${req.params.id}`
+        `Category with id: ${req.params.id} was not found`
       );
       return res
         .status(notFoundResponse.statusCode)
-        .json({ sucess: false, error: notFoundResponse });
+        .json({ success: false, error: notFoundResponse });
     }
 
-    res.json({ success: true, data: "Category was deleted successfully" });
+    if (category.image) {
+      await imageUploadService.deleteImageFromS3(category.image);
+    }
+
+    const deletedCategory = await categoryService.deleteCategory(req.params.id);
+
+    if (!deletedCategory) {
+      const notFoundResponse = getNotFoundError(
+        `Category with id: ${req.params.id} was not found`
+      );
+      return res
+        .status(notFoundResponse.statusCode)
+        .json({ success: false, error: notFoundResponse });
+    }
+
+    res.json({ success: true, data: "Category deleted successfully" });
   } catch (error) {
     const errorResponse = getInternalServerError(
       `Failed to delete category with id: ${req.params.id}`,
       error
     );
-    res
+    return res
       .status(errorResponse.statusCode)
       .json({ success: false, error: errorResponse });
   }

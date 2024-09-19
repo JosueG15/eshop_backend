@@ -8,6 +8,7 @@ import {
 } from "../controllers/categoryController";
 import { protect } from "../middlewares/authMiddleware";
 import { requireAdmin } from "../middlewares/roleMiddleware";
+import upload from "../config/multer";
 
 const router = Router();
 
@@ -117,9 +118,19 @@ router.get("/categories/:id", getCategory);
  *     requestBody:
  *       required: true
  *       content:
- *         application/json:
+ *         multipart/form-data:
  *           schema:
- *             $ref: '#/components/schemas/Category'
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *               color:
+ *                 type: string
+ *               icon:
+ *                 type: string
+ *               image:
+ *                 type: string
+ *                 format: binary
  *     responses:
  *       201:
  *         description: The category was successfully created
@@ -129,18 +140,16 @@ router.get("/categories/:id", getCategory);
  *               $ref: '#/components/schemas/Category'
  *       400:
  *         description: Bad request (missing required fields)
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/Error'
  *       500:
  *         description: Internal server error
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/Error'
  */
-router.post("/categories", protect, requireAdmin, createCategory);
+router.post(
+  "/categories",
+  protect,
+  requireAdmin,
+  upload.single("image"),
+  createCategory
+);
 
 /**
  * @swagger
@@ -150,19 +159,22 @@ router.post("/categories", protect, requireAdmin, createCategory);
  *     security:
  *       - bearerAuth: []
  *     tags: [Categories]
- *     parameters:
- *       - in: path
- *         name: id
- *         schema:
- *           type: string
- *         required: true
- *         description: The category ID
  *     requestBody:
- *       required: true
+ *       required: false
  *       content:
- *         application/json:
+ *         multipart/form-data:
  *           schema:
- *             $ref: '#/components/schemas/Category'
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *               color:
+ *                 type: string
+ *               icon:
+ *                 type: string
+ *               image:
+ *                 type: string
+ *                 format: binary
  *     responses:
  *       200:
  *         description: The category was successfully updated
@@ -170,20 +182,20 @@ router.post("/categories", protect, requireAdmin, createCategory);
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/Category'
+ *       400:
+ *         description: Bad request (missing required fields)
  *       404:
  *         description: Category not found
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/Error'
  *       500:
  *         description: Internal server error
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/Error'
  */
-router.put("/categories/:id", protect, requireAdmin, updateCategory);
+router.put(
+  "/categories/:id",
+  protect,
+  requireAdmin,
+  upload.single("image"),
+  updateCategory
+);
 
 /**
  * @swagger

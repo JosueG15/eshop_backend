@@ -10,6 +10,7 @@ import {
 } from "../controllers/productController";
 import { protect } from "../middlewares/authMiddleware";
 import { requireAdmin } from "../middlewares/roleMiddleware";
+import upload from "../config/multer";
 
 const router = Router();
 
@@ -38,6 +39,14 @@ const router = Router();
  *         richDescription:
  *           type: string
  *           description: A more detailed description of the product
+ *         image:
+ *           type: string
+ *           description: The main image of the product
+ *         images:
+ *           type: array
+ *           items:
+ *             type: string
+ *           description: List of additional image URLs
  *         price:
  *           type: number
  *           description: The price of the product
@@ -260,80 +269,98 @@ router.get("/products/:id", protect, getProduct);
  * @swagger
  * /products:
  *   post:
- *     summary: Create a new product
+ *     summary: Create a new product with images
  *     security:
  *       - bearerAuth: []
  *     tags: [Products]
  *     requestBody:
- *       required: true
  *       content:
- *         application/json:
+ *         multipart/form-data:
  *           schema:
- *             $ref: '#/components/schemas/Product'
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *               description:
+ *                 type: string
+ *               price:
+ *                 type: number
+ *               category:
+ *                 type: string
+ *               countInStock:
+ *                 type: number
+ *               images:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *                   format: binary
  *     responses:
  *       201:
  *         description: The product was successfully created
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/Product'
  *       400:
- *         description: Bad request (missing required fields)
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/Error'
+ *         description: Bad request
  *       500:
  *         description: Internal server error
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/Error'
  */
-router.post("/products", protect, requireAdmin, createProduct);
+router.post(
+  "/products",
+  protect,
+  requireAdmin,
+  upload.array("images"),
+  createProduct
+);
 
 /**
  * @swagger
  * /products/{id}:
  *   put:
- *     summary: Update an existing product by ID
+ *     summary: Update an existing product with images
  *     security:
  *       - bearerAuth: []
  *     tags: [Products]
  *     parameters:
  *       - in: path
  *         name: id
+ *         required: true
  *         schema:
  *           type: string
- *         required: true
  *         description: The product ID
  *     requestBody:
- *       required: true
  *       content:
- *         application/json:
+ *         multipart/form-data:
  *           schema:
- *             $ref: '#/components/schemas/Product'
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *               description:
+ *                 type: string
+ *               price:
+ *                 type: number
+ *               category:
+ *                 type: string
+ *               countInStock:
+ *                 type: number
+ *               images:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *                   format: binary
  *     responses:
  *       200:
  *         description: The product was successfully updated
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/Product'
  *       404:
  *         description: Product not found
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/Error'
  *       500:
  *         description: Internal server error
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/Error'
  */
-router.put("/products/:id", protect, requireAdmin, updateProduct);
+router.put(
+  "/products/:id",
+  protect,
+  requireAdmin,
+  upload.array("images"),
+  updateProduct
+);
 
 /**
  * @swagger
