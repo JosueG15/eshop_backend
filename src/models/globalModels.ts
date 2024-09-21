@@ -9,6 +9,10 @@ export interface GlobalFilters {
   };
   isFeatured?: boolean;
   role?: string;
+  name?: {
+    $regex: string;
+    $options?: string;
+  };
 }
 
 export interface GlobalQueryParams {
@@ -19,6 +23,7 @@ export interface GlobalQueryParams {
   isFeatured?: string;
   page?: string;
   limit?: string;
+  name?: string;
 }
 
 export interface AuthenticatedRequest extends Request {

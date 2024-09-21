@@ -14,8 +14,12 @@ export const handleGlobalError = (
 };
 
 export const buildGlobalFilters = (query: GlobalQueryParams): GlobalFilters => {
-  const { category, minPrice, maxPrice, isFeatured, role } = query;
+  const { category, minPrice, maxPrice, isFeatured, role, name } = query;
   const filters: GlobalFilters = {};
+
+  if (name) {
+    filters.name = { $regex: name, $options: "i" };
+  }
 
   // Category filter (for products)
   if (category) filters.category = category;
