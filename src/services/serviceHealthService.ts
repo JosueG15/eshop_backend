@@ -3,7 +3,7 @@ import { ServiceHealthResponse } from "../models/serviceHealthModel";
 import { PackageModel } from "../models/packageModel";
 import fs from "fs";
 import path from "path";
-import redisClient from "../config/redisClient"; // Import existing Redis client
+import redisClient from "../config/redisClient";
 import { ListBucketsCommand } from "@aws-sdk/client-s3";
 import s3 from "../config/s3Client";
 

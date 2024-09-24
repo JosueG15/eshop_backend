@@ -1,4 +1,4 @@
-import mongoose, { Schema, Document } from "mongoose";
+import mongoose, { Schema, Document, QueryWithHelpers } from "mongoose";
 import { IOrderItem } from "./orderItemModel";
 import { IUser } from "./userModel";
 
@@ -85,16 +85,19 @@ orderSchema.virtual("id").get(function (this: IOrder) {
   return this._id.toHexString();
 });
 
-orderSchema.pre(/^find/, function (next) {
-  this.populate({
-    path: "orderItems",
-    populate: {
-      path: "product",
-      select: "name price",
-    },
-  }).populate("user");
-  next();
-});
+orderSchema.pre(
+  /^find/,
+  function (this: QueryWithHelpers<IOrder, IOrder>, next) {
+    this.populate({
+      path: "orderItems",
+      populate: {
+        path: "product",
+        select: "name price",
+      },
+    }).populate("user");
+    next();
+  }
+);
 
 const Order = mongoose.model<IOrder>("Order", orderSchema);
 
