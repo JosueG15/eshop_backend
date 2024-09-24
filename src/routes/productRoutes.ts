@@ -177,6 +177,11 @@ router.get("/products/featured", getFeaturedProducts);
  *           type: string
  *         description: Filter by category ID
  *       - in: query
+ *         name: name
+ *         schema:
+ *           type: string
+ *         description: Filter by product name
+ *       - in: query
  *         name: minPrice
  *         schema:
  *           type: number
@@ -205,6 +210,8 @@ router.get("/products/featured", getFeaturedProducts);
  *                   type: integer
  *                 limit:
  *                   type: integer
+ *                 name:
+ *                   type: string
  *                 totalProducts:
  *                   type: integer
  *                 totalPages:

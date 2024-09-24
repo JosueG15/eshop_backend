@@ -20,7 +20,7 @@
     "http-status-codes": "^2.3.0",
     "ioredis": "^5.4.1",
     "jsonwebtoken": "^9.0.2",
-    "moongose": "^1.0.0",
+    "mongoose": "^1.0.0",
     "morgan": "^1.10.0",
     "multer": "^1.4.5-lts.1",
     "nodemon": "^3.1.4",
