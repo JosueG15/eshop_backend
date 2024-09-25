@@ -2,7 +2,9 @@ import { JwtPayload } from "./jwtModel";
 import { Request } from "express";
 
 export interface GlobalFilters {
-  category?: string;
+  category?: {
+    $in: string[];
+  };
   price?: {
     $gte?: number;
     $lte?: number;

@@ -22,7 +22,10 @@ export const buildGlobalFilters = (query: GlobalQueryParams): GlobalFilters => {
   }
 
   // Category filter (for products)
-  if (category) filters.category = category;
+  if (category) {
+    const categories = category.split(",");
+    filters.category = { $in: categories };
+  }
 
   // Price filter (for products)
   if (minPrice) {

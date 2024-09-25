@@ -175,7 +175,7 @@ router.get("/products/featured", getFeaturedProducts);
  *         name: category
  *         schema:
  *           type: string
- *         description: Filter by category ID
+ *         description: Filter by category IDs (comma-separated values for multiple categories)
  *       - in: query
  *         name: name
  *         schema:
@@ -233,6 +233,7 @@ router.get("/products/featured", getFeaturedProducts);
  *             schema:
  *               $ref: '#/components/schemas/Error'
  */
+
 router.get("/products", getProducts);
 
 /**
