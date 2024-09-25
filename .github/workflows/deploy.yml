@@ -24,7 +24,7 @@ jobs:
       - name: Build the project
         run: yarn build
 
-      - name: Deploy to EC2
+      - name: Deploy to EC2 and restart PM2 with env update
         uses: appleboy/ssh-action@v0.1.8
         with:
           host: ${{ secrets.EC2_HOST }}
@@ -35,4 +35,4 @@ jobs:
             git pull origin main
             yarn install
             yarn build
-            pm2 restart all
+            pm2 restart all --update-env
