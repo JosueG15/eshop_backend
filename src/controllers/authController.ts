@@ -14,6 +14,37 @@ export const login = async (req: Request, res: Response) => {
   }
 };
 
+export const register = async (req: Request, res: Response) => {
+  const {
+    name,
+    email,
+    passwordHash,
+    street,
+    aparment,
+    city,
+    zip,
+    country,
+    phone,
+  } = req.body;
+
+  try {
+    const { token, user } = await authService.register({
+      name,
+      email,
+      passwordHash,
+      street,
+      aparment,
+      city,
+      zip,
+      country,
+      phone,
+    });
+    res.status(201).json({ success: true, token, user });
+  } catch (error) {
+    return handleGlobalError(res, "Failed to register iser", error);
+  }
+};
+
 export const logout = async (req: Request, res: Response) => {
   try {
     const token = req.headers.authorization?.split(" ")[1];

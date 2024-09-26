@@ -1,6 +1,6 @@
 import User, { IUser } from "../models/userModel";
 import bcrypt from "bcrypt";
-import { GlobalFilters, GlobalQueryParams } from "../models/globalModels";
+import { GlobalFilters } from "../models/globalModels";
 
 export class UserService {
   async createUser(userData: IUser): Promise<IUser> {

@@ -183,7 +183,7 @@ router.get("/users/:id", protect, getUser);
  *             schema:
  *               $ref: '#/components/schemas/Error'
  */
-router.post("/users", createUser);
+router.post("/users", protect, requireAdmin, createUser);
 
 /**
  * @swagger

@@ -1,4 +1,4 @@
-import User from "../models/userModel";
+import User, { IUser } from "../models/userModel";
 import bcrypt from "bcrypt";
 import { generateToken, verifyToken } from "../helpers/jwtHelper";
 import redis from "../config/redisClient";
@@ -19,6 +19,25 @@ export class AuthService {
 
     const token = this.generateAccessToken(user.id, user.isAdmin);
     return { token, user };
+  }
+
+  async register(data: Partial<IUser>) {
+    const existingUser = await User.findOne({ email: data.email });
+    if (existingUser) {
+      throw new Error("User already exists");
+    }
+
+    const hashedPassword = await bcrypt.hash(data.passwordHash as string, 10);
+    const newUser = new User({
+      ...data,
+      passwordHash: hashedPassword,
+      isAdmin: false,
+    });
+
+    await newUser.save();
+
+    const token = this.generateAccessToken(newUser.id, newUser.isAdmin);
+    return { token, user: newUser };
   }
 
   private generateAccessToken(userId: string, isAdmin: boolean) {

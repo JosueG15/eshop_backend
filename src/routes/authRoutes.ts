@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { login, logout } from "../controllers/authController";
+import { login, logout, register } from "../controllers/authController";
 import { protect } from "../middlewares/authMiddleware";
 
 const router = Router();
@@ -39,6 +39,56 @@ const router = Router();
  *         description: Invalid credentials
  */
 router.post("/login", login);
+
+/**
+ * @swagger
+ * /register:
+ *   post:
+ *     summary: User registration
+ *     tags: [Authentication]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *               email:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *               street:
+ *                 type: string
+ *               aparment:
+ *                 type: string
+ *               city:
+ *                 type: string
+ *               zip:
+ *                 type: string
+ *               country:
+ *                 type: string
+ *               phone:
+ *                 type: number
+ *     responses:
+ *       201:
+ *         description: User registered successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 token:
+ *                   type: string
+ *                 user:
+ *                   $ref: '#/components/schemas/User'
+ *       400:
+ *         description: Bad request
+ */
+router.post("/register", register);
 
 /**
  * @swagger
