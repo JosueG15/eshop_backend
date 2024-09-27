@@ -5,7 +5,7 @@ export interface IUser extends Document {
   email: string;
   passwordHash: string;
   street: string;
-  aparment?: string;
+  apartment?: string;
   city: string;
   zip: string;
   country: string;
@@ -35,7 +35,7 @@ const userSchema: Schema = new Schema(
       trim: true,
       default: "",
     },
-    aparment: {
+    apartment: {
       type: String,
       trim: true,
       default: "",

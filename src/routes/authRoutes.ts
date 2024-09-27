@@ -61,7 +61,7 @@ router.post("/login", login);
  *                 type: string
  *               street:
  *                 type: string
- *               aparment:
+ *               apartment:
  *                 type: string
  *               city:
  *                 type: string
