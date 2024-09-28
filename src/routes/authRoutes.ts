@@ -70,7 +70,7 @@ router.post("/login", login);
  *               country:
  *                 type: string
  *               phone:
- *                 type: number
+ *                 type: string
  *     responses:
  *       201:
  *         description: User registered successfully

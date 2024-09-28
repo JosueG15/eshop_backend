@@ -9,7 +9,7 @@ export interface IUser extends Document {
   city: string;
   zip: string;
   country: string;
-  phone: number;
+  phone: string;
   isAdmin: boolean;
 }
 
@@ -58,9 +58,8 @@ const userSchema: Schema = new Schema(
       default: "",
     },
     phone: {
-      type: Number,
+      type: String,
       required: true,
-      default: "",
     },
     isAdmin: {
       type: Boolean,
