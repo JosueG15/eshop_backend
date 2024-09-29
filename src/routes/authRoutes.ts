@@ -63,6 +63,8 @@ router.post("/login", login);
  *                 type: string
  *               address2:
  *                 type: string
+ *               state:
+ *                 type: string
  *               city:
  *                 type: string
  *               zip:

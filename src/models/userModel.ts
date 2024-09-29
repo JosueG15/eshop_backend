@@ -6,6 +6,7 @@ export interface IUser extends Document {
   passwordHash: string;
   address: string;
   address2?: string;
+  state: string;
   city: string;
   zip: string;
   country: string;
@@ -38,6 +39,12 @@ const userSchema: Schema = new Schema(
     },
     address2: {
       type: String,
+      trim: true,
+      default: "",
+    },
+    state: {
+      type: String,
+      required: true,
       trim: true,
       default: "",
     },

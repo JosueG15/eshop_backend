@@ -31,7 +31,7 @@ const router = Router();
  *       type: object
  *       required:
  *         - orderItems
- *         - shippingAddress1
+ *         - address
  *         - city
  *         - country
  *         - phone
@@ -45,12 +45,15 @@ const router = Router();
  *           type: array
  *           items:
  *             $ref: '#/components/schemas/OrderItem'
- *         shippingAddress1:
+ *         address:
  *           type: string
  *           description: Primary shipping address
- *         shippingAddress2:
+ *         address2:
  *           type: string
  *           description: Secondary shipping address (optional)
+ *         state:
+ *           type: string
+ *           description: Shipping State
  *         city:
  *           type: string
  *           description: Shipping city

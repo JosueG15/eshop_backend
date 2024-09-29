@@ -45,6 +45,9 @@ const router = Router();
  *         address2:
  *           type: string
  *           description: Optional address for the user
+ *         state:
+ *           type: string
+ *           description: State of the user
  *         city:
  *           type: string
  *           description: City of the user

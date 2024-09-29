@@ -4,8 +4,9 @@ import { IUser } from "./userModel";
 
 export interface IOrder extends Document {
   orderItems: IOrderItem[];
-  shippingAddress1: string;
-  shippingAddress2?: string;
+  address: string;
+  address2?: string;
+  state: string;
   city: string;
   zip: string;
   country: string;
@@ -25,12 +26,16 @@ const orderSchema: Schema = new Schema(
         required: true,
       },
     ],
-    shippingAddress1: {
+    address: {
       type: String,
       required: true,
     },
-    shippingAddress2: {
+    address2: {
       type: String,
+    },
+    state: {
+      type: String,
+      required: true,
     },
     city: {
       type: String,

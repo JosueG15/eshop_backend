@@ -27,8 +27,9 @@ export class OrderService {
 
       const newOrder = new Order({
         orderItems: orderItemsIds,
-        shippingAddress1: orderData.shippingAddress1,
-        shippingAddress2: orderData.shippingAddress2 || "",
+        address: orderData.address,
+        address2: orderData.address2 || "",
+        state: orderData.state,
         city: orderData.city,
         zip: orderData.zip,
         country: orderData.country,
