@@ -1,9 +1,12 @@
 import { Request, Response } from "express";
 import { UserService } from "../services/userService";
 import { buildGlobalFilters, handleGlobalError } from "../helpers/globalHelper";
+import { getBadRequestError } from "../helpers/errorHelper";
 import { validatePaginationParams } from "../helpers/paginationHelper";
+import { ImageUploadService } from "../services/imageUploadService";
 
 const userService = new UserService();
+const imageUploadService = new ImageUploadService();
 
 export const createUser = async (req: Request, res: Response) => {
   try {
@@ -119,5 +122,40 @@ export const getUserCount = async (req: Request, res: Response) => {
     res.json({ success: true, count: totalUsers });
   } catch (error) {
     return handleGlobalError(res, "Failed to fetch user count", error);
+  }
+};
+
+export const uploadUserAvatar = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const file = req.file as Express.Multer.File;
+
+    if (!file) {
+      return res.status(400).json({
+        success: false,
+        error: getBadRequestError(`No image file were provided`),
+      });
+    }
+
+    const imageUrl = await imageUploadService.uploadImageToS3(file);
+
+    const updatedUser = await userService.updateUser(id, {
+      avatar: imageUrl.Location,
+    });
+
+    if (!updatedUser) {
+      return res.status(400).json({
+        success: false,
+        error: getBadRequestError(`User with ID ${id} was not found`),
+      });
+    }
+
+    res.json({ success: true, data: updatedUser });
+  } catch (error) {
+    return handleGlobalError(
+      res,
+      `Failed to upload avatar for user with ID: ${req.params.id}`,
+      error
+    );
   }
 };

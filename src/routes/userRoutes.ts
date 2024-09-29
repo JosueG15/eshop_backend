@@ -6,9 +6,11 @@ import {
   updateUser,
   deleteUser,
   getUserCount,
+  uploadUserAvatar,
 } from "../controllers/userController";
 import { protect } from "../middlewares/authMiddleware";
 import { requireAdmin } from "../middlewares/roleMiddleware";
+import upload from "../config/multer";
 
 const router = Router();
 
@@ -37,12 +39,12 @@ const router = Router();
  *         passwordHash:
  *           type: string
  *           description: The hashed password of the user
- *         street:
+ *         address:
  *           type: string
- *           description: Street address of the user
- *         apartment:
+ *           description: Address of the user
+ *         address2:
  *           type: string
- *           description: Apartment number of the user
+ *           description: Optional address for the user
  *         city:
  *           type: string
  *           description: City of the user
@@ -97,6 +99,65 @@ const router = Router();
  *               $ref: '#/components/schemas/Error'
  */
 router.get("/users/count", protect, requireAdmin, getUserCount);
+
+/**
+ * @swagger
+ * /users/{id}/avatar:
+ *   post:
+ *     summary: Upload an avatar for a user
+ *     security:
+ *       - bearerAuth: []
+ *     tags: [Users]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: The ID of the user
+ *     requestBody:
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               avatar:
+ *                 type: string
+ *                 format: binary
+ *                 description: The user's avatar image file
+ *     responses:
+ *       200:
+ *         description: Avatar uploaded successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/User'
+ *       400:
+ *         description: No image file provided
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ *       404:
+ *         description: User not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ *       500:
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ */
+
+router.post(
+  "/users/:id/avatar",
+  protect,
+  upload.single("avatar"),
+  uploadUserAvatar
+);
 
 /**
  * @swagger

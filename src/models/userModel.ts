@@ -4,13 +4,14 @@ export interface IUser extends Document {
   name: string;
   email: string;
   passwordHash: string;
-  street: string;
-  apartment?: string;
+  address: string;
+  address2?: string;
   city: string;
   zip: string;
   country: string;
   phone: string;
   isAdmin: boolean;
+  avatar?: string;
 }
 
 const userSchema: Schema = new Schema(
@@ -30,12 +31,12 @@ const userSchema: Schema = new Schema(
       type: String,
       required: true,
     },
-    street: {
+    address: {
       type: String,
       trim: true,
       default: "",
     },
-    apartment: {
+    address2: {
       type: String,
       trim: true,
       default: "",
@@ -54,6 +55,11 @@ const userSchema: Schema = new Schema(
     country: {
       type: String,
       required: true,
+      trim: true,
+      default: "",
+    },
+    avatar: {
+      type: String,
       trim: true,
       default: "",
     },

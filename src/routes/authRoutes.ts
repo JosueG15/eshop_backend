@@ -59,9 +59,9 @@ router.post("/login", login);
  *                 type: string
  *               password:
  *                 type: string
- *               street:
+ *               address:
  *                 type: string
- *               apartment:
+ *               address2:
  *                 type: string
  *               city:
  *                 type: string
