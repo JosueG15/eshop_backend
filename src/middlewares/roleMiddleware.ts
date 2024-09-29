@@ -10,7 +10,7 @@ export const requireAdmin = (
     let errorMessage = "Access denied. Admins only.";
 
     if (
-      req.method === "PATCH" &&
+      req.method === "PUT" &&
       /^\/users\/\w+$/.test(req.path) &&
       req.body.hasOwnProperty("isAdmin")
     ) {
