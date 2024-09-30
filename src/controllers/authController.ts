@@ -43,7 +43,7 @@ export const register = async (req: Request, res: Response) => {
     });
     res.status(201).json({ success: true, token, user });
   } catch (error) {
-    return handleGlobalError(res, "Failed to register iser", error);
+    return handleGlobalError(res, "Failed to register user", error);
   }
 };
 

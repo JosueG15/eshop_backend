@@ -8,9 +8,10 @@ export const handleGlobalError = (
   error: any
 ) => {
   const errorResponse = getInternalServerError(message, error);
-  return res
-    .status(errorResponse.statusCode)
-    .json({ success: false, error: errorResponse });
+  return res.status(errorResponse.statusCode).json({
+    success: false,
+    error: errorResponse,
+  });
 };
 
 export const buildGlobalFilters = (query: GlobalQueryParams): GlobalFilters => {
