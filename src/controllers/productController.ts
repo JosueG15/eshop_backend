@@ -62,23 +62,39 @@ export const createProduct = async (req: Request, res: Response) => {
 
     if (!name || !description || !price || !category || !countInStock) {
       const badRequestResponse = getBadRequestError(
-        "Product required fields are missing",
-        { body: req.body }
+        "Product required fields are missing"
       );
       return res
         .status(badRequestResponse.statusCode)
         .json({ success: false, error: badRequestResponse });
     }
 
-    await checkCategoryExists(category);
+    let parsedCategory;
+    try {
+      parsedCategory = JSON.parse(category);
+    } catch (parseError) {
+      const badRequestResponse = getBadRequestError(
+        "Category format is invalid. Must be a valid JSON object."
+      );
+      return res
+        .status(badRequestResponse.statusCode)
+        .json({ success: false, error: badRequestResponse });
+    }
+
+    await checkCategoryExists(parsedCategory.id);
 
     const imageUrls = await imageUploadService.uploadImagesToS3(files);
 
-    const newProduct = await productService.createProduct({
+    const newProductData = {
       ...req.body,
+      category: parsedCategory.id,
+      price: Number(price),
+      countInStock: Number(countInStock),
       image: imageUrls[0],
       images: imageUrls,
-    });
+    };
+
+    const newProduct = await productService.createProduct(newProductData);
 
     res.status(201).json({ success: true, data: newProduct });
   } catch (error) {
@@ -88,22 +104,38 @@ export const createProduct = async (req: Request, res: Response) => {
 
 export const updateProduct = async (req: Request, res: Response) => {
   try {
-    const { category } = req.body;
+    const { category, price, countInStock } = req.body;
     const files = req.files as Express.Multer.File[];
 
+    let updatedCategoryId;
     if (category) {
-      await checkCategoryExists(category);
+      try {
+        const parsedCategory =
+          typeof category === "string" ? JSON.parse(category) : category;
+        updatedCategoryId = parsedCategory.id;
+        await checkCategoryExists(updatedCategoryId);
+      } catch (parseError) {
+        const badRequestResponse = getBadRequestError(
+          "Invalid category format. Must be a JSON object with a valid ID."
+        );
+        return res
+          .status(badRequestResponse.statusCode)
+          .json({ success: false, error: badRequestResponse });
+      }
     }
 
-    let updatedProductData = req.body;
-    if (files && files.length > 0) {
-      const imageUrls = await imageUploadService.uploadImagesToS3(files);
-      updatedProductData = {
-        ...req.body,
-        image: imageUrls[0],
-        images: imageUrls,
-      };
-    }
+    const imageUrls =
+      files && files.length > 0
+        ? await imageUploadService.uploadImagesToS3(files)
+        : undefined;
+
+    const updatedProductData = {
+      ...req.body,
+      ...(updatedCategoryId && { category: updatedCategoryId }),
+      ...(price && { price: Number(price) }),
+      ...(countInStock && { countInStock: Number(countInStock) }),
+      ...(imageUrls && { image: imageUrls[0], images: imageUrls }),
+    };
 
     const updatedProduct = await productService.updateProduct(
       req.params.id,
