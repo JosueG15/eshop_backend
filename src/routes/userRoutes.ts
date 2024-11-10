@@ -290,7 +290,7 @@ router.post("/users", protect, requireAdmin, createUser);
  *             schema:
  *               $ref: '#/components/schemas/Error'
  */
-router.put("/users/:id", protect, requireAdmin, updateUser);
+router.put("/users/:id", protect, updateUser);
 
 /**
  * @swagger
