@@ -8,7 +8,6 @@ export const requireAdmin = (
 ) => {
   if (!req.user?.isAdmin) {
     let errorMessage = "Access denied. Admins only.";
-
     return res.status(403).json({ success: false, message: errorMessage });
   }
   next();
