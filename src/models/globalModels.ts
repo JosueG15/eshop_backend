@@ -15,6 +15,7 @@ export interface GlobalFilters {
     $regex: string;
     $options?: string;
   };
+  user?: string;
 }
 
 export interface GlobalQueryParams {
@@ -26,6 +27,7 @@ export interface GlobalQueryParams {
   page?: string;
   limit?: string;
   name?: string;
+  userId?: string;
 }
 
 export interface AuthenticatedRequest extends Request {

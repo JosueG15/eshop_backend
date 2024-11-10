@@ -11,6 +11,7 @@ import productRoutes from "./routes/productRoutes";
 import orderRoutes from "./routes/orderRoutes";
 import authRoutes from "./routes/authRoutes";
 import userRoutes from "./routes/userRoutes";
+import paymentRoutes from "./routes/paymentRoute";
 import { setupSwagger } from "./config/swagger";
 
 const app = express();
@@ -38,6 +39,7 @@ app.use(`${process.env.API_V1_URL}`, productRoutes);
 app.use(`${process.env.API_V1_URL}`, userRoutes);
 app.use(`${process.env.API_V1_URL}`, authRoutes);
 app.use(`${process.env.API_V1_URL}`, orderRoutes);
+app.use(`${process.env.API_V1_URL}`, paymentRoutes);
 
 app.listen(process.env.API_PORT, () => {
   console.log(`The server is running in port 3000`);

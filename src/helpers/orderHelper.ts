@@ -5,7 +5,7 @@ import { getNotFoundError, getBadRequestError } from "../helpers/errorHelper";
 
 export const validateOrderItemsStock = async (orderItems: IOrderItem[]) => {
   for (const item of orderItems) {
-    const product = await Product.findById(item.product);
+    const product = await Product.findById(item.id);
 
     if (!product) {
       throw getNotFoundError("Product not found", {
@@ -53,7 +53,7 @@ export const createOrderItems = async (
   const orderItemsIds = await Promise.all(
     orderItems.map(async (orderItem) => {
       const newOrderItem = new OrderItem({
-        product: orderItem.product,
+        product: orderItem.id,
         quantity: orderItem.quantity,
       });
       const savedOrderItem = await newOrderItem.save({ session });
@@ -69,7 +69,7 @@ export const updateProductStock = async (
   session: mongoose.ClientSession
 ): Promise<void> => {
   for (const item of orderItems) {
-    const product = await Product.findById(item.product).session(session);
+    const product = await Product.findById(item.id).session(session);
 
     if (!product) {
       throw getNotFoundError("Product not found", { productId: item.product });

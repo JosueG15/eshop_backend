@@ -15,7 +15,8 @@ export const handleGlobalError = (
 };
 
 export const buildGlobalFilters = (query: GlobalQueryParams): GlobalFilters => {
-  const { category, minPrice, maxPrice, isFeatured, role, name } = query;
+  const { category, minPrice, maxPrice, isFeatured, role, name, userId } =
+    query;
   const filters: GlobalFilters = {};
 
   if (name) {
@@ -56,6 +57,11 @@ export const buildGlobalFilters = (query: GlobalQueryParams): GlobalFilters => {
       throw getBadRequestError("Invalid role value", { role });
     }
     filters.role = role;
+  }
+
+  // User ID filter to get orders specific to a user
+  if (userId) {
+    filters.user = userId;
   }
 
   return filters;
